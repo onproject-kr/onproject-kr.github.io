@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공고 게시판 - 주식회사 온프로젝트</title>
+  <meta name="description" content="주식회사 온프로젝트 공고 게시판">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+                   "Noto Sans KR", "Malgun Gothic", sans-serif;
+      background: #ffffff;
+      color: #24292f;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid #d0d7de;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header .brand {
+      font-weight: 600;
+      font-size: 15px;
+      color: #57606a;
+      text-decoration: none;
+    }
+
+    header nav a {
+      color: #0969da;
+      text-decoration: none;
+      font-size: 14px;
+      margin-left: 16px;
+    }
+    header nav a:hover { text-decoration: underline; }
+    header nav a.active { color: #24292f; font-weight: 600; }
+
+    main {
+      flex: 1;
+      max-width: 960px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      font-weight: 600;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #d0d7de;
+    }
+
+    /* 검색 & 필터 */
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 240px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #f6f8fa;
+      color: #24292f;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #0969da;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8b949e;
+      pointer-events: none;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 6px 12px;
+      border: 1px solid #d0d7de;
+      background: #f6f8fa;
+      color: #24292f;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.12s;
+    }
+
+    .filter-btn:hover { background: #eef2f5; }
+
+    .filter-btn.active {
+      background: #0969da;
+      color: white;
+      border-color: #0969da;
+    }
+
+    .count-info {
+      font-size: 13px;
+      color: #57606a;
+      margin-bottom: 12px;
+    }
+
+    /* 목록 */
+    .post-list {
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .post-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid #d0d7de;
+      cursor: pointer;
+      transition: background 0.12s;
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .post-item:last-child { border-bottom: none; }
+    .post-item:hover { background: #f6f8fa; }
+
+    .post-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: #57606a;
+    }
+
+    .post-category {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: #ddf4ff;
+      color: #0969da;
+      font-weight: 500;
+      font-size: 11px;
+    }
+
+    .post-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #24292f;
+      margin-bottom: 4px;
+    }
+
+    .post-summary {
+      font-size: 13px;
+      color: #57606a;
+      line-height: 1.5;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: #57606a;
+      font-size: 14px;
+    }
+
+    /* 페이지네이션 */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .pagination button {
+      padding: 6px 12px;
+      border: 1px solid #d0d7de;
+      background: #fff;
+      color: #24292f;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      min-width: 36px;
+    }
+
+    .pagination button:hover:not(:disabled) { background: #f6f8fa; }
+
+    .pagination button.active {
+      background: #0969da;
+      color: white;
+      border-color: #0969da;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* 상세 뷰 */
+    .post-detail { display: none; }
+
+    .post-detail .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 16px;
+      color: #0969da;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .post-detail .back-link:hover { text-decoration: underline; }
+
+    .post-detail .detail-header {
+      border-bottom: 1px solid #d0d7de;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    .post-detail h2 {
+      font-size: 1.6em;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #24292f;
+    }
+
+    .post-detail .detail-meta {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #57606a;
+    }
+
+    .post-detail .content {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #24292f;
+    }
+
+    .post-detail .content p { margin-bottom: 12px; }
+    .post-detail .content ul,
+    .post-detail .content ol { margin: 12px 0 12px 24px; }
+    .post-detail .content li { margin-bottom: 4px; }
+    .post-detail .content h3 {
+      margin: 24px 0 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+    .post-detail .content table {
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .post-detail .content td,
+    .post-detail .content th {
+      border: 1px solid #d0d7de;
+      padding: 8px 14px;
+      text-align: left;
+    }
+    .post-detail .content th {
+      background: #f6f8fa;
+      font-weight: 600;
+    }
+    .post-detail .content em {
+      font-style: normal;
+      color: #57606a;
+      font-size: 13px;
+    }
+
+    /* 뷰 토글 */
+    body.detail-view .list-view { display: none; }
+    body.detail-view .post-detail { display: block; }
+
+    footer {
+      border-top: 1px solid #d0d7de;
+      padding: 20px 40px;
+      font-size: 13px;
+      color: #57606a;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 16px 20px; }
+      main { padding: 24px 20px; }
+      footer { padding: 16px 20px; }
+      h1 { font-size: 1.5em; }
+      .controls { flex-direction: column; align-items: stretch; }
+      .post-detail h2 { font-size: 1.3em; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="brand">jwork-kr</a>
+    <nav>
+      <a href="index.html">홈</a>
+      <a href="board.html" class="active">공고</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 목록 뷰 -->
+    <section class="list-view">
+      <h1>공고 게시판</h1>
+
+      <div class="controls">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.5 11.5L14 14M7 13A6 6 0 1 1 7 1a6 6 0 0 1 0 12z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="search" placeholder="제목 또는 내용 검색…" autocomplete="off">
+        </div>
+        <div class="filter-group" id="filters">
+          <button class="filter-btn active" data-category="all">전체</button>
+        </div>
+      </div>
+
+      <div class="count-info" id="countInfo"></div>
+      <div class="post-list" id="postList"></div>
+      <div class="pagination" id="pagination"></div>
+    </section>
+
+    <!-- 상세 뷰 -->
+    <article class="post-detail">
+      <a href="#" class="back-link" id="backLink">← 목록으로</a>
+      <div class="detail-header">
+        <h2 id="detail-title"></h2>
+        <div class="detail-meta">
+          <span class="post-category" id="detail-category"></span>
+          <span id="detail-date"></span>
+          <span id="detail-author"></span>
+        </div>
+      </div>
+      <div class="content" id="detail-content"></div>
+    </article>
+  </main>
+
+  <footer>
+    &copy; 2026 J-Work Corporation. All rights reserved.
+  </footer>
+
+  <script>
+    const PAGE_SIZE = 10;
+    let allPosts = [];
+    let filteredPosts = [];
+    let currentPage = 1;
+    let currentCategory = 'all';
+    let currentSearch = '';
+
+    async function loadPosts() {
+      try {
+        const res = await fetch('posts.json');
+        if (!res.ok) throw new Error('fetch failed');
+        const data = await res.json();
+        allPosts = (data.posts || []).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+        // 카테고리 버튼 동적 생성
+        const cats = [...new Set(allPosts.map(p => p.category).filter(Boolean))];
+        const filtersEl = document.getElementById('filters');
+        cats.forEach(cat => {
+          const btn = document.createElement('button');
+          btn.className = 'filter-btn';
+          btn.dataset.category = cat;
+          btn.textContent = cat;
+          filtersEl.appendChild(btn);
+        });
+
+        bindFilterClicks();
+        applyFilters();
+        handleRoute();
+      } catch (err) {
+        document.getElementById('postList').innerHTML =
+          '<div class="empty-state">공고 데이터를 불러올 수 없습니다.<br><small>posts.json 파일이 있는지 확인하거나 웹 서버에서 열어주세요.</small></div>';
+      }
+    }
+
+    function bindFilterClicks() {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.dataset.category;
+          currentPage = 1;
+          applyFilters();
+        });
+      });
+    }
+
+    function applyFilters() {
+      filteredPosts = allPosts.filter(post => {
+        if (currentCategory !== 'all' && post.category !== currentCategory) return false;
+        if (currentSearch) {
+          const q = currentSearch.toLowerCase();
+          const hay = [post.title, post.summary, post.content, post.category, post.author]
+            .filter(Boolean).join(' ').toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+      renderList();
+    }
+
+    function renderList() {
+      const listEl = document.getElementById('postList');
+      const countEl = document.getElementById('countInfo');
+      const total = filteredPosts.length;
+
+      countEl.textContent = total > 0 ? `총 ${total}건` : '';
+
+      if (total === 0) {
+        listEl.innerHTML = '<div class="empty-state">해당하는 공고가 없습니다.</div>';
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pagePosts = filteredPosts.slice(start, start + PAGE_SIZE);
+
+      listEl.innerHTML = pagePosts.map(post => `
+        <a href="#post=${encodeURIComponent(post.id)}" class="post-item">
+          <div class="post-meta">
+            <span class="post-category">${esc(post.category)}</span>
+            <span>${esc(post.date)}</span>
+          </div>
+          <div class="post-title">${esc(post.title)}</div>
+          <div class="post-summary">${esc(post.summary || '')}</div>
+        </a>
+      `).join('');
+
+      renderPagination(total);
+    }
+
+    function renderPagination(total) {
+      const pages = Math.ceil(total / PAGE_SIZE);
+      const pgEl = document.getElementById('pagination');
+      if (pages <= 1) { pgEl.innerHTML = ''; return; }
+
+      let html = '';
+      html += `<button ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}">이전</button>`;
+      for (let i = 1; i <= pages; i++) {
+        html += `<button class="${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+      }
+      html += `<button ${currentPage === pages ? 'disabled' : ''} data-page="${currentPage + 1}">다음</button>`;
+
+      pgEl.innerHTML = html;
+      pgEl.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentPage = parseInt(btn.dataset.page);
+          renderList();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+    }
+
+    function handleRoute() {
+      const hash = window.location.hash;
+      const m = hash.match(/^#post=(.+)$/);
+      if (m) {
+        const id = decodeURIComponent(m[1]);
+        const post = allPosts.find(p => p.id === id);
+        if (post) { renderDetail(post); return; }
+      }
+      document.body.classList.remove('detail-view');
+    }
+
+    function renderDetail(post) {
+      document.getElementById('detail-title').textContent = post.title;
+      document.getElementById('detail-category').textContent = post.category || '';
+      document.getElementById('detail-date').textContent = post.date || '';
+      document.getElementById('detail-author').textContent = post.author || '';
+      document.getElementById('detail-content').innerHTML = post.content || '';
+      document.title = post.title + ' - 주식회사 온프로젝트';
+      document.body.classList.add('detail-view');
+      window.scrollTo(0, 0);
+    }
+
+    function esc(str) {
+      return String(str || '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    document.getElementById('search').addEventListener('input', e => {
+      currentSearch = e.target.value.trim();
+      currentPage = 1;
+      applyFilters();
+    });
+
+    document.getElementById('backLink').addEventListener('click', e => {
+      e.preventDefault();
+      history.pushState(null, '', 'board.html');
+      document.title = '공고 게시판 - 주식회사 온프로젝트';
+      handleRoute();
+    });
+
+    window.addEventListener('hashchange', handleRoute);
+
+    loadPosts();
+  </script>
+</body>
+</html>

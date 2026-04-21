@@ -2,11 +2,116 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>onproject-kr</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주식회사 온프로젝트</title>
+  <meta name="description" content="주식회사 온프로젝트(OnProject Corporation) 공식 홈페이지">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+                   "Noto Sans KR", "Malgun Gothic", sans-serif;
+      background: #ffffff;
+      color: #24292f;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid #d0d7de;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header .brand {
+      font-weight: 600;
+      font-size: 15px;
+      color: #57606a;
+      text-decoration: none;
+    }
+
+    header nav a {
+      color: #0969da;
+      text-decoration: none;
+      font-size: 14px;
+      margin-left: 16px;
+    }
+    header nav a:hover { text-decoration: underline; }
+    header nav a.active { color: #24292f; font-weight: 600; }
+
+    main {
+      flex: 1;
+      max-width: 820px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+
+    h1 {
+      font-size: 2em;
+      font-weight: 600;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #d0d7de;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 16px;
+      color: #24292f;
+    }
+
+    .cta {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 8px 16px;
+      background: #0969da;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .cta:hover { background: #0860ca; }
+
+    footer {
+      border-top: 1px solid #d0d7de;
+      padding: 20px 40px;
+      font-size: 13px;
+      color: #57606a;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 16px 20px; }
+      main { padding: 40px 20px; }
+      footer { padding: 16px 20px; }
+      h1 { font-size: 1.6em; }
+    }
+  </style>
 </head>
 <body>
-  <h1>환영합니다</h1>
-  <p>주식회사 온프로젝트의 홈페이지입니다.</p>
-  <p>현재 홈페이지 제작 중에 있습니다.</p>
+  <header>
+    <a href="index.html" class="brand">jwork-kr</a>
+    <nav>
+      <a href="index.html" class="active">홈</a>
+      <a href="board.html">공고</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>환영합니다</h1>
+    <p>주식회사 온프로젝트(OnProject Corporation)의 홈페이지입니다.</p>
+    <p>현재 홈페이지 제작 중에 있습니다.</p>
+    <a href="board.html" class="cta">공고 게시판 바로가기 →</a>
+  </main>
+
+  <footer>
+    &copy; 2026 J-Work Corporation. All rights reserved.
+  </footer>
 </body>
 </html>
